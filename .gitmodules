@@ -1,0 +1,12 @@
+[submodule "box2cpp"]
+	path = box2cpp
+	url = https://github.com/HolyBlackCat/box2cpp
+[submodule "imgui"]
+	path = imgui
+	url = https://github.com/ocornut/imgui
+[submodule "sfml"]
+	path = sfml
+	url = https://github.com/sfml/sfml
+[submodule "box2d"]
+	path = box2d
+	url = https://github.com/erincatto/box2d
