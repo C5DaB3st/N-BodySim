@@ -1,7 +1,6 @@
 #include "world.h"
 #include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/System/Clock.hpp>
-#include <iostream>
 
 int main() {
   sf::RenderWindow window = windowInit();
@@ -21,6 +20,8 @@ int main() {
     }
 
     ImGui::SFML::Update(window, deltaClock.restart());
+
+    world.Step(timeStep, subStepCount);
 
     window.clear();
     // call all draws here
