@@ -1,3 +1,4 @@
+#include "bodies.h"
 #include "world.h"
 #include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/System/Clock.hpp>
@@ -9,6 +10,10 @@ int main() {
 
   // test shape size
   sf::CircleShape circle(30);
+  PhysicsWorld physWorld;
+  physWorld.init();
+
+  Planet planet(physWorld);
 
   while (window.isOpen()) {
     while (const auto event = window.pollEvent()) {
@@ -21,12 +26,11 @@ int main() {
 
     ImGui::SFML::Update(window, deltaClock.restart());
 
-    world.Step(timeStep, subStepCount);
+    physWorld.world.Step(World::timeStep, World::subStepCount);
 
     window.clear();
     // call all draws here
-    worldInit();
-    window.draw(circle);
+    window.draw(planet.celestialShape);
     ImGui::SFML::Render(window);
     window.display();
   }

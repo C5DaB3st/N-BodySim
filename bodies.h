@@ -5,10 +5,14 @@
 #ifndef N_BODY_SPACE_BODIES_H
 #define N_BODY_SPACE_BODIES_H
 
+#include "world.h"
+#include <box2cpp/box2cpp.h>
 #include <memory>
 #include <vector>
 
-#include <box2cpp/box2cpp.h>
+namespace Bodies {
+const float box2DScale = 1.0f / 30.0f; // scale box2D to SFML
+}
 
 enum BodyType { SUN = 0, PLANET, ASTEROID };
 
@@ -16,11 +20,15 @@ class CelestialBody {
 public:
   void spawnBody(CelestialBody body);
   void gravitationPull();
+  void setMass(CelestialBody &body);
+  float getMass();
+  b2Vec2 getPosition();
+  b2::Body celestialBody;
+  sf::CircleShape celestialShape;
   BodyType type;
-  int setSize(CelestialBody body);
 
 private:
-  int mass; // also size
+  float mass; // also size
   int acceleration;
   b2Vec2 position;
   float gravity;
@@ -28,13 +36,9 @@ private:
 
 class Planet : public CelestialBody {
 public:
-  Planet();
-  ~Planet();
+  Planet(PhysicsWorld &physWorld);
 
   std::vector<std::unique_ptr<Planet>> planets;
-
-private:
-  BodyType type = PLANET;
 };
 
 class Sun : public CelestialBody {
