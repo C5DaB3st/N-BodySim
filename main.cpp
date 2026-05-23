@@ -11,7 +11,6 @@ int main() {
   // test shape size
   sf::CircleShape circle(30);
   PhysicsWorld physWorld;
-  physWorld.init();
 
   Planet planet(physWorld);
 
@@ -23,10 +22,8 @@ int main() {
         window.close();
       }
     }
-
-    ImGui::SFML::Update(window, deltaClock.restart());
-
     physWorld.world.Step(World::timeStep, World::subStepCount);
+    ImGui::SFML::Update(window, deltaClock.restart());
 
     window.clear();
     // call all draws here

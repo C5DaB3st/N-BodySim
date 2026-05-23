@@ -52,4 +52,5 @@ Planet::Planet(PhysicsWorld &physWorld) {
                                 b2Circle{.center = {0, 0}, .radius = radius});
   celestialShape.setRadius(radius);
   celestialShape.setPosition({origin.x, -origin.y});
+  celestialShape.setFillColor(sf::Color::White);
 }

@@ -26,7 +26,7 @@ b2Vec2 randomCoord() {
   return result;
 }
 
-void PhysicsWorld::init() {
+PhysicsWorld::PhysicsWorld() {
   world.SetGravity({0.0f, 0.0f}); // no gravity in space :P
 
   b2::Body::Params bodyParam;

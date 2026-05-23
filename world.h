@@ -22,7 +22,7 @@ const b2Vec2 worldGravity = {0, 0};
 // persistent
 class PhysicsWorld {
 public:
-  void init();
-  b2::World world;
+  PhysicsWorld();
+  b2::World world{b2::World::Params{}};
 };
 #endif // N_BODY_SPACE_WORLD_H
