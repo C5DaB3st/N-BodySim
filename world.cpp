@@ -6,8 +6,8 @@
 #include <random>
 
 sf::RenderWindow windowInit() {
-  constexpr int width = 1280;
-  constexpr int height = 720;
+  constexpr int width = 1920;
+  constexpr int height = 1080;
 
   sf::ContextSettings settings;
   settings.antiAliasingLevel = 0;
@@ -23,8 +23,8 @@ sf::RenderWindow windowInit() {
 
 b2Vec2 randomCoord() {
   std::mt19937 gen(std::random_device{}());
-  std::uniform_int_distribution<> xCoord(0, 1280);
-  std::uniform_int_distribution<> yCoord(0, 720);
+  std::uniform_int_distribution<> xCoord(-300, 300);
+  std::uniform_int_distribution<> yCoord(-300, 300);
 
   b2Vec2 result{};
   result.x = xCoord(gen);

@@ -18,7 +18,8 @@ namespace World {
 constexpr float timeStep = 1.0f / 60.0f;
 constexpr int subStepCount = 4;
 const b2Vec2 worldGravity = {0, 0};
-const float universalGravityConst = -6.674 * std::exp(-11);
+const float universalGravityConst = -6.674 * std::exp(-11) * 15000.0f;
+constexpr float box2DScale = 30.f;
 } // namespace World
 
 class CelestialBody;

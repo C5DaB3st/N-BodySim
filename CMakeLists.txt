@@ -25,6 +25,7 @@ add_executable(N_Body_Space
         main.cpp
         bodies.cpp
         world.cpp
+        camera.cpp
 )
 
 # 4. Bind include paths and link targets

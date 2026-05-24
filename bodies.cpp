@@ -32,9 +32,39 @@ float calcGravForce(float massX, float massY, float distance) {
          ((massX * massY) / (distance * distance));
 }
 
+void CelestialBody::setInitialVelocity() {
+  float distance{};
+
+  b2Vec2 dirVector{}, pos1, pos2;
+  for (int i = 0; i < celestialBodies.size(); ++i) {
+    for (int j = i + 1; j < celestialBodies.size(); ++j) {
+      pos1 = celestialBodies[i]->celestialBody.GetPosition();
+      pos2 = celestialBodies[j]->celestialBody.GetPosition();
+
+      distance = calcDistance(pos2, pos1);
+      dirVector = vectorDecomp(pos1, pos2);
+      dirVector.x /= 30.f;
+      dirVector.y /= 30.f;
+      if (distance < 0.1f)
+        continue;
+
+      b2Vec2 normVector = {-dirVector.y, dirVector.x};
+      float orbitalSpeed =
+          std::sqrt((World::universalGravityConst *
+                     celestialBodies[i]->celestialBody.GetMass()) /
+                    distance);
+
+      b2Vec2 initalVelocity = orbitalSpeed * normVector;
+
+      celestialBodies[j]->celestialBody.SetLinearVelocity(initalVelocity);
+    }
+  }
+}
+
 void CelestialBody::addForce() {
   float gravForce{};
   float distance{};
+  float acceleration{};
   b2Vec2 dirVector{}, pos1, pos2;
   for (int i = 0; i < celestialBodies.size(); ++i) {
     for (int j = i + 1; j < celestialBodies.size(); ++j) {
@@ -46,22 +76,36 @@ void CelestialBody::addForce() {
       if (distance < 0.1f)
         continue;
 
+      // gravitational force
       gravForce =
           calcGravForce(celestialBodies[i]->celestialBody.GetMass(),
                         celestialBodies[j]->celestialBody.GetMass(), distance);
       dirVector = vectorDecomp(pos1, pos2);
-      dirVector *= gravForce * 15000.0f;
+
+      // gravitational force
+
+      // initial velocity
+      b2Vec2 normVector = {-dirVector.y, dirVector.x};
+      float orbitalSpeed =
+          std::sqrt((World::universalGravityConst *
+                     celestialBodies[i]->celestialBody.GetMass()) /
+                    distance);
+
+      b2Vec2 initalVelocity = orbitalSpeed * normVector;
+      // initalVelocity
+      dirVector *= gravForce;
       celestialBodies[i]->celestialBody.ApplyForceToCenter(dirVector, true);
       celestialBodies[j]->celestialBody.ApplyForceToCenter(-dirVector, true);
+      celestialBodies[j]->celestialBody.SetLinearVelocity(initalVelocity);
     }
   }
 }
 
 void CelestialBody::setSize(CelestialBody &body) {
   std::mt19937 gen(std::random_device{}());
-  std::uniform_int_distribution<> sunRange(15, 30);
-  std::uniform_int_distribution<> planetRange(7, 12);
-  std::uniform_int_distribution<> astrRange(1, 6);
+  std::uniform_real_distribution<> sunRange(30.f, 100.f);
+  std::uniform_real_distribution<> planetRange(5.f, 30.f);
+  std::uniform_real_distribution<> astrRange(.2f, 3.f);
 
   switch (body.type) {
   case SUN:
@@ -82,7 +126,8 @@ float CelestialBody::getSize() { return this->size; }
 
 sf::Vector2f CelestialBody::getBodyPosition() {
   b2Vec2 bodyPos = this->celestialBody.GetPosition();
-  return sf::Vector2f(bodyPos.x * 30, bodyPos.y * 30);
+  return sf::Vector2f(bodyPos.x * World::box2DScale,
+                      bodyPos.y * World::box2DScale);
 }
 
 std::vector<std::unique_ptr<CelestialBody>> CelestialBody::celestialBodies;
@@ -90,9 +135,9 @@ std::vector<std::unique_ptr<CelestialBody>> CelestialBody::celestialBodies;
 Planet::Planet(PhysicsWorld &physWorld) {
   type = PLANET;
   setSize(*this);
-  float radius = getSize() * Bodies::box2DScale;
+  float radius = getSize() * World::box2DScale;
   b2Vec2 origin = randomCoord();
-  position = {origin.x / 30, origin.y / 30};
+  position = {origin.x * World::box2DScale, origin.y * World::box2DScale};
   b2::Body::Params bodyParam;
   bodyParam.position = position;
   bodyParam.type = b2_dynamicBody;
@@ -103,7 +148,28 @@ Planet::Planet(PhysicsWorld &physWorld) {
       celestialBody.CreateShape(b2::DestroyWithParent, b2::Shape::Params{},
                                 b2Circle{.center = {0, 0}, .radius = radius});
 
-  celestialSprite.setRadius(getSize());
+  celestialSprite.setRadius(getSize() * World::box2DScale);
   celestialSprite.setPosition(this->getBodyPosition());
   celestialSprite.setFillColor(sf::Color::White);
+}
+
+Sun::Sun(PhysicsWorld &physWorld) {
+  type = PLANET;
+  setSize(*this);
+  float radius = getSize() * World::box2DScale;
+  b2Vec2 origin = randomCoord();
+  position = {origin.x * World::box2DScale, origin.y * World::box2DScale};
+  b2::Body::Params bodyParam;
+  bodyParam.position = position;
+  bodyParam.type = b2_dynamicBody;
+  setInitialVelocity();
+  celestialBody = physWorld.world.CreateBody(b2::OwningHandle, bodyParam);
+
+  b2::ShapeRef physShape =
+      celestialBody.CreateShape(b2::DestroyWithParent, b2::Shape::Params{},
+                                b2Circle{.center = {0, 0}, .radius = radius});
+
+  celestialSprite.setRadius(getSize() * World::box2DScale);
+  celestialSprite.setPosition(this->getBodyPosition());
+  celestialSprite.setFillColor(sf::Color::Yellow);
 }

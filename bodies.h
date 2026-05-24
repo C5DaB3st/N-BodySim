@@ -11,16 +11,13 @@
 #include <memory>
 #include <vector>
 
-namespace Bodies {
-const float box2DScale = 1.0f / 30.0f; // scale box2D to SFML
-}
-
 enum BodyType { SUN = 0, PLANET, ASTEROID };
 
 class CelestialBody {
 public:
   template <class T, class... Args> static T &addBody(Args &&...args);
   void addForce();
+  void setInitialVelocity();
   void setSize(CelestialBody &body);
   float getSize();
   sf::Vector2f getBodyPosition();
@@ -43,7 +40,7 @@ public:
 
 class Sun : public CelestialBody {
 public:
-  Sun();
+  Sun(PhysicsWorld &physWorld);
 
 private:
   BodyType type = SUN;
@@ -51,7 +48,7 @@ private:
 
 class Asteroid : public CelestialBody {
 public:
-  Asteroid();
+  Asteroid(PhysicsWorld &physWorld);
 
 private:
   BodyType type = ASTEROID;
