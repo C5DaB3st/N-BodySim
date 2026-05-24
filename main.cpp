@@ -12,8 +12,13 @@ int main() {
   sf::CircleShape circle(30);
   PhysicsWorld physWorld;
 
-  Planet planet(physWorld);
+  CelestialBody celestBody;
 
+  for (int i = 0; i < 4; i++) {
+    celestBody.addBody<Planet>(physWorld);
+  }
+  sf::Vector2f pos;
+  b2Vec2 posPhys;
   while (window.isOpen()) {
     while (const auto event = window.pollEvent()) {
       ImGui::SFML::ProcessEvent(window, *event);
@@ -22,12 +27,15 @@ int main() {
         window.close();
       }
     }
-    physWorld.world.Step(World::timeStep, World::subStepCount);
+
+    celestBody.addForce();
+    physWorld.update(CelestialBody::celestialBodies);
+
     ImGui::SFML::Update(window, deltaClock.restart());
 
     window.clear();
     // call all draws here
-    window.draw(planet.celestialShape);
+    drawCelestialBodies(window);
     ImGui::SFML::Render(window);
     window.display();
   }

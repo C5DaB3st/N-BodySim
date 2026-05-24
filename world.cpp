@@ -1,12 +1,19 @@
 #include "world.h"
-#include <ctime>
+#include "SFML/Graphics/RenderWindow.hpp"
+#include "SFML/Window/ContextSettings.hpp"
+#include "SFML/Window/WindowEnums.hpp"
+#include "bodies.h"
 #include <random>
 
 sf::RenderWindow windowInit() {
   constexpr int width = 1280;
   constexpr int height = 720;
+
+  sf::ContextSettings settings;
+  settings.antiAliasingLevel = 0;
   sf::RenderWindow window(sf::VideoMode({width, height}),
-                          "Nth Body Simulation - CsDaBest");
+                          "Nth Body Simulation - CsDaBest", sf::Style::Default,
+                          sf::State::Windowed, settings);
 
   if (ImGui::SFML::Init(window))
     return window;
@@ -15,7 +22,7 @@ sf::RenderWindow windowInit() {
 }
 
 b2Vec2 randomCoord() {
-  std::mt19937 gen(std::time(nullptr));
+  std::mt19937 gen(std::random_device{}());
   std::uniform_int_distribution<> xCoord(0, 1280);
   std::uniform_int_distribution<> yCoord(0, 720);
 
@@ -27,9 +34,21 @@ b2Vec2 randomCoord() {
 }
 
 PhysicsWorld::PhysicsWorld() {
-  world.SetGravity({0.0f, 0.0f}); // no gravity in space :P
+  world.SetGravity(World::worldGravity); // no gravity in space :P
 
   b2::Body::Params bodyParam;
   bodyParam.type = b2_dynamicBody;
+}
+
+void PhysicsWorld::update(std::vector<std::unique_ptr<CelestialBody>> &bodies) {
+  world.Step(World::timeStep, World::subStepCount);
+
+  for (auto &body : bodies) {
+    body->celestialSprite.setPosition(body->getBodyPosition());
+  }
+}
+void drawCelestialBodies(sf::RenderWindow &window) {
+  for (auto &body : CelestialBody::celestialBodies)
+    window.draw(body->celestialSprite);
 }
 void buildGui() {}
