@@ -16,11 +16,13 @@ int main() {
 
   CelestialBody celestBody;
 
-  for (int i = 0; i < 10; i++) {
+  for (int i = 0; i < 8; i++) {
     celestBody.addBody<Planet>(physWorld);
-    celestBody.addBody<Sun>(physWorld);
   }
 
+  celestBody.addBody<Sun>(physWorld);
+
+  celestBody.setInitialVelocity();
   sf::Vector2f pos;
   b2Vec2 posPhys;
   while (window.isOpen()) {
